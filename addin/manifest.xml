@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="TaskPaneApp">
+  <Id>6b1f4c2e-8a3d-4e57-9f61-2c7d0a5b9e14</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Nodirbek</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="O‘zbek alifbosi konvertori"/>
+  <Description DefaultValue="Word matnini eski lotin, yangi lotin va kirill yozuvlari o‘rtasida almashtiradi."/>
+  <IconUrl DefaultValue="https://placehold.co/32x32/0b7a86/ffffff.png?text=%C3%96"/>
+  <HighResolutionIconUrl DefaultValue="https://placehold.co/80x80/0b7a86/ffffff.png?text=%C3%96"/>
+  <SupportUrl DefaultValue="https://github.com/nodirbek5298/uzbek-alifbo-konvertor"/>
+  <AppDomains>
+    <AppDomain>https://nodirbek5298.github.io</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Document"/>
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://nodirbek5298.github.io/uzbek-alifbo-konvertor/addin/taskpane.html"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <FunctionFile resid="Commands.Url"/>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <CustomTab id="Konvertor.Tab">
+              <Group id="Konvertor.Group">
+                <Label resid="Group.Label"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16"/>
+                  <bt:Image size="32" resid="Icon.32"/>
+                  <bt:Image size="80" resid="Icon.80"/>
+                </Icon>
+                <Control xsi:type="Button" id="Konvertor.Open">
+                  <Label resid="Open.Label"/>
+                  <Supertip>
+                    <Title resid="Open.Label"/>
+                    <Description resid="Open.Desc"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16"/>
+                    <bt:Image size="32" resid="Icon.32"/>
+                    <bt:Image size="80" resid="Icon.80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>KonvertorPane</TaskpaneId>
+                    <SourceLocation resid="Pane.Url"/>
+                  </Action>
+                </Control>
+                <Control xsi:type="Menu" id="Konvertor.Menu">
+                  <Label resid="Menu.Label"/>
+                  <Supertip>
+                    <Title resid="Menu.Label"/>
+                    <Description resid="Menu.Desc"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16"/>
+                    <bt:Image size="32" resid="Icon.32"/>
+                    <bt:Image size="80" resid="Icon.80"/>
+                  </Icon>
+                  <Items>
+                    <Item id="Konvertor.OldNew">
+                      <Label resid="I.OldNew"/>
+                      <Supertip><Title resid="I.OldNew"/><Description resid="Item.Desc"/></Supertip>
+                      <Icon><bt:Image size="16" resid="Icon.16"/><bt:Image size="32" resid="Icon.32"/><bt:Image size="80" resid="Icon.80"/></Icon>
+                      <Action xsi:type="ExecuteFunction"><FunctionName>oldToNew</FunctionName></Action>
+                    </Item>
+                    <Item id="Konvertor.NewOld">
+                      <Label resid="I.NewOld"/>
+                      <Supertip><Title resid="I.NewOld"/><Description resid="Item.Desc"/></Supertip>
+                      <Icon><bt:Image size="16" resid="Icon.16"/><bt:Image size="32" resid="Icon.32"/><bt:Image size="80" resid="Icon.80"/></Icon>
+                      <Action xsi:type="ExecuteFunction"><FunctionName>newToOld</FunctionName></Action>
+                    </Item>
+                    <Item id="Konvertor.OldCyr">
+                      <Label resid="I.OldCyr"/>
+                      <Supertip><Title resid="I.OldCyr"/><Description resid="Item.Desc"/></Supertip>
+                      <Icon><bt:Image size="16" resid="Icon.16"/><bt:Image size="32" resid="Icon.32"/><bt:Image size="80" resid="Icon.80"/></Icon>
+                      <Action xsi:type="ExecuteFunction"><FunctionName>oldToCyr</FunctionName></Action>
+                    </Item>
+                    <Item id="Konvertor.CyrOld">
+                      <Label resid="I.CyrOld"/>
+                      <Supertip><Title resid="I.CyrOld"/><Description resid="Item.Desc"/></Supertip>
+                      <Icon><bt:Image size="16" resid="Icon.16"/><bt:Image size="32" resid="Icon.32"/><bt:Image size="80" resid="Icon.80"/></Icon>
+                      <Action xsi:type="ExecuteFunction"><FunctionName>cyrToOld</FunctionName></Action>
+                    </Item>
+                    <Item id="Konvertor.NewCyr">
+                      <Label resid="I.NewCyr"/>
+                      <Supertip><Title resid="I.NewCyr"/><Description resid="Item.Desc"/></Supertip>
+                      <Icon><bt:Image size="16" resid="Icon.16"/><bt:Image size="32" resid="Icon.32"/><bt:Image size="80" resid="Icon.80"/></Icon>
+                      <Action xsi:type="ExecuteFunction"><FunctionName>newToCyr</FunctionName></Action>
+                    </Item>
+                    <Item id="Konvertor.CyrNew">
+                      <Label resid="I.CyrNew"/>
+                      <Supertip><Title resid="I.CyrNew"/><Description resid="Item.Desc"/></Supertip>
+                      <Icon><bt:Image size="16" resid="Icon.16"/><bt:Image size="32" resid="Icon.32"/><bt:Image size="80" resid="Icon.80"/></Icon>
+                      <Action xsi:type="ExecuteFunction"><FunctionName>cyrToNew</FunctionName></Action>
+                    </Item>
+                  </Items>
+                </Control>
+              </Group>
+              <Label resid="Tab.Label"/>
+            </CustomTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="https://placehold.co/16x16/0b7a86/ffffff.png?text=%C3%96"/>
+        <bt:Image id="Icon.32" DefaultValue="https://placehold.co/32x32/0b7a86/ffffff.png?text=%C3%96"/>
+        <bt:Image id="Icon.80" DefaultValue="https://placehold.co/80x80/0b7a86/ffffff.png?text=%C3%96"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Commands.Url" DefaultValue="https://nodirbek5298.github.io/uzbek-alifbo-konvertor/addin/commands.html"/>
+        <bt:Url id="Pane.Url" DefaultValue="https://nodirbek5298.github.io/uzbek-alifbo-konvertor/addin/taskpane.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="Tab.Label" DefaultValue="Konvertor"/>
+        <bt:String id="Group.Label" DefaultValue="Alifbo"/>
+        <bt:String id="Open.Label" DefaultValue="Konvertor paneli"/>
+        <bt:String id="Menu.Label" DefaultValue="Tez almashtirish"/>
+        <bt:String id="I.OldNew" DefaultValue="Eski lotin → Yangi lotin"/>
+        <bt:String id="I.NewOld" DefaultValue="Yangi lotin → Eski lotin"/>
+        <bt:String id="I.OldCyr" DefaultValue="Eski lotin → Kirill"/>
+        <bt:String id="I.CyrOld" DefaultValue="Kirill → Eski lotin"/>
+        <bt:String id="I.NewCyr" DefaultValue="Yangi lotin → Kirill"/>
+        <bt:String id="I.CyrNew" DefaultValue="Kirill → Yangi lotin"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="Open.Desc" DefaultValue="Yozuvlarni tanlab, tanlangan matn yoki butun hujjatni almashtiradi."/>
+        <bt:String id="Menu.Desc" DefaultValue="Tanlangan matnni (tanlanmagan bo‘lsa butun hujjatni) bir bosishda almashtiradi."/>
+        <bt:String id="Item.Desc" DefaultValue="Tanlangan matnni, tanlanmagan bo‘lsa butun hujjatni almashtiradi."/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>
