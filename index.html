@@ -32,6 +32,9 @@ textarea{width:100%;min-height:200px;resize:vertical;font:inherit;background:var
 .m{color:var(--mut);font-size:.9rem;margin-top:8px}
 .map{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .map span{border:1px solid var(--gold);border-radius:999px;padding:2px 10px;font-size:.9rem}
+.map small{color:var(--mut);align-self:center}
+.chip{cursor:pointer}
+.chip:hover{background:var(--gold);color:#14233b}
 </style></head><body><main>
 <header class="hd"><h1>O‘zbek alifbosi konvertori</h1><p>Eski lotin, yangi lotin va kirill yozuvlari o‘rtasida matn va fayllarni almashtiring.</p></header>
 
@@ -46,17 +49,25 @@ textarea{width:100%;min-height:200px;resize:vertical;font:inherit;background:var
 <div><label for="b">Natija</label><textarea id="b" readonly></textarea></div>
 </div>
 <div class="row" style="margin-top:10px"><button class="btn p" id="cp">Nusxalash</button><button class="btn" id="cl">Tozalash</button><span class="m" id="st"></span></div>
+<div class="map" id="amb"></div>
+</div>
+
+<div class="card">
+<label for="ex">Istisno lug‘ati</label><textarea id="ex" style="min-height:90px" placeholder="so‘z=natija (har qatorda bittadan)"></textarea>
+<div class="m">Shubhali so‘zni bossangiz, shu yerga qo‘shiladi. Lug‘at brauzeringizda saqlanadi.</div>
 </div>
 
 <div class="card">
 <label>Fayl</label><div class="row"><select id="ff" aria-label="Fayl: qayerdan"><option value="o" selected>Eski lotin</option><option value="n">Yangi lotin</option><option value="c">Kirill</option></select><button class="btn" id="fsw" title="Almashtirish">⇄</button><select id="ft" aria-label="Fayl: qayerga"><option value="o">Eski lotin</option><option value="n" selected>Yangi lotin</option><option value="c">Kirill</option></select></div><div class="map" id="fmap"></div>
-<div id="drop" style="margin-top:12px">Faylni shu yerga tashlang yoki tanlash uchun bosing<br><small>.txt .docx .pdf .md .csv .srt .html .json</small></div>
-<input type="file" id="fi" hidden accept=".txt,.docx,.pdf,.md,.csv,.srt,.html,.json">
-<div class="row" style="margin-top:10px"><button class="btn p" id="dl" hidden>Natijani yuklab olish</button><span class="m" id="fs"></span></div><textarea id="fo" readonly hidden style="margin-top:10px;min-height:140px"></textarea>
+<div class="row" style="margin-top:10px"><label for="of" style="margin:0">PDF va rasm natijasi:</label><select id="of"><option value="txt">TXT</option><option value="docx">Word (.docx)</option></select></div>
+<div id="drop" style="margin-top:12px">Faylni shu yerga tashlang yoki tanlash uchun bosing<br><small>.txt .docx .pdf .png .jpg .md .csv .srt .html .json</small></div>
+<input type="file" id="fi" hidden accept=".txt,.docx,.pdf,.png,.jpg,.jpeg,.webp,.bmp,.md,.csv,.srt,.html,.json">
+<div class="row" style="margin-top:10px"><button class="btn p" id="dl" hidden>Natijani yuklab olish</button><span class="m" id="fs"></span></div><textarea id="fo" readonly hidden style="margin-top:10px;min-height:140px"></textarea><div class="map" id="famb"></div>
 </div>
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <script>
 const Q="['‘’ʻʼ`´′]";
 const fwd=s=>{let n=0;
@@ -91,12 +102,16 @@ if(up(c))m=cap(m,len==2&&up(n)&&m.length>1);
 o+=m;i+=len}return o}
 const toOld={o:s=>[s,0],n:rev,c:s=>[cyr2lat(s),(s.match(CY)||[]).length]};
 const fromOld={o:s=>[s,0],n:fwd,c:s=>{const r=lat2cyr(s);return[r,(r.match(CY)||[]).length]}};
-const conv=(A="fr",B="to")=>s=>{const f=$(A).value,t=$(B).value;if(f==t)return[s,0];const[a,n]=toOld[f](s),[b,m]=fromOld[t](a);return[b,Math.max(n,m)]};
+const WR=/\p{L}+(?:['‘’ʻʼ`´′]\p{L}+)*/gu;
+const cs=(w,x)=>w.length>1&&w==w.toUpperCase()?x.toUpperCase():w[0]!=w[0].toLowerCase()?x[0].toUpperCase()+x.slice(1):x;
+let EX={};
+const conv=(A="fr",B="to")=>s=>{const f=$(A).value,t=$(B).value;if(f==t)return[s,0];let n=0;
+const o=s.replace(WR,w=>{const x=EX[w.toLowerCase()];if(x!=null){n++;return cs(w,x)}const[a,c]=toOld[f](w),[b,m]=fromOld[t](a);n+=Math.max(c,m);return b});return[o,n]};
 function map(A,B,id){const f=$(A).value,t=$(B).value,nw=f=="n"||t=="n",cy=f=="c"||t=="c";
 let a;if(f==t)a=[];else if(cy)a=nw?["Ў ↔ Ö","Ғ ↔ Ğ","Ш ↔ Ş","Ч ↔ Ç","Қ ↔ Q","Ҳ ↔ H"]:["Ў ↔ O‘","Ғ ↔ G‘","Ш ↔ Sh","Ч ↔ Ch","Қ ↔ Q","Ҳ ↔ H"];
 else a=t=="n"?["O‘ → Ö","G‘ → Ğ","Sh → Ş","Ch → Ç"]:["Ö → O‘","Ğ → G‘","Ş → Sh","Ç → Ch"];
 $(id).innerHTML=a.map(x=>"<span>"+x+"</span>").join("")}
-function run(){const [r,n]=conv()($("a").value);$("b").value=r;$("st").textContent=$("a").value?n+" ta almashtirish":""}
+function run(){const [r,n]=conv()($("a").value);$("b").value=r;$("st").textContent=$("a").value?n+" ta almashtirish":"";amb("amb",$("a").value,$("fr").value,$("to").value)}
 const chg=()=>{map("fr","to","map");run()},fchg=()=>{map("ff","ft","fmap");if(res)file(res.src)};
 $("fr").onchange=$("to").onchange=chg;
 $("sw").onclick=()=>{const t=$("fr").value;$("fr").value=$("to").value;$("to").value=t;chg()};
@@ -115,18 +130,42 @@ async function pdfText(f){pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.
 const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,o=[];
 for(let i=1;i<=d.numPages;i++){const p=await(await d.getPage(i)).getTextContent();let s="";for(const it of p.items)s+=it.str+(it.hasEOL?"\n":"");o.push(s)}
 return o.join("\n\n")}
+const IMG=["png","jpg","jpeg","webp","bmp"];
+function amb(id,s,f,t){let re=null;if(f=="c")re=/ц|сҳ/i;else if(t=="c")re=/ts|ye/i;else if(f=="o"&&t=="n")re=/shh|chh|ssh|cch/i;
+const el=$(id);if(!re||!s){el.innerHTML="";return}
+const w=[...new Set((s.match(WR)||[]).filter(x=>re.test(x)).map(x=>x.toLowerCase()))].slice(0,30);
+el.innerHTML=w.length?"<small>Tekshiring:</small>"+w.map(x=>'<span class="chip" data-w="'+x+'">'+x+'</span>').join(""):""}
+async function ocr(src,lang){if(typeof Tesseract=="undefined")throw new Error("OCR yuklanmadi");
+const w=await Tesseract.createWorker(lang),o=[];
+try{for(let i=0;i<src.length;i++){$("fs").textContent="OCR: "+(i+1)+"/"+src.length;o.push((await w.recognize(src[i])).data.text)}}finally{await w.terminate()}
+return o.join("\n\n")}
+async function pdfImgs(f,max){pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,c=[];
+for(let i=1;i<=Math.min(d.numPages,max);i++){const p=await d.getPage(i),v=p.getViewport({scale:2}),cv=document.createElement("canvas");cv.width=v.width;cv.height=v.height;await p.render({canvasContext:cv.getContext("2d"),viewport:v}).promise;c.push(cv)}
+return c}
+async function mkdocx(t){const H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',e=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,"");
+const ps=t.split("\n").map(l=>l?'<w:p><w:r><w:t xml:space="preserve">'+e(l)+'</w:t></w:r></w:p>':"<w:p/>").join(""),z=new JSZip();
+z.file("[Content_Types].xml",H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+z.file("_rels/.rels",H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+z.file("word/document.xml",H+'<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+ps+'</w:body></w:document>');
+return z.generateAsync({type:"blob"})}
 async function file(f){
 $("fs").textContent="Ishlanmoqda...";$("dl").hidden=true;
 try{const base=f.name.replace(/\.[^.]+$/,""),ext=(f.name.split(".").pop()||"").toLowerCase();
 let data,n,out=ext,txt=null;const cv=conv("ff","ft");
 if(ext=="docx"){[data,n]=await docx(f,cv)}
-else{const t=ext=="pdf"?await pdfText(f):await f.text();
-if(!t.trim()){res=null;$("fo").hidden=true;$("fs").textContent="Faylda matn topilmadi (skan qilingan PDF bo‘lishi mumkin).";return}
-[data,n]=cv(t);txt=data;if(ext=="pdf")out="txt"}
+else{const L=$("ff").value=="c"?"uzb_cyrl":"uzb",im=IMG.includes(ext);let t;
+if(ext=="pdf"){t=await pdfText(f);if(!t.trim())t=await ocr(await pdfImgs(f,30),L)}
+else if(im)t=await ocr([f],L);
+else t=await f.text();
+if(!t.trim()){res=null;$("fo").hidden=true;$("fs").textContent="Faylda matn topilmadi.";return}
+amb("famb",t,$("ff").value,$("ft").value);
+[data,n]=cv(t);txt=data;if(ext=="pdf"||im){out=$("of").value;if(out=="docx")data=await mkdocx(txt)}}
 $("fo").hidden=txt==null;if(txt!=null)$("fo").value=txt.length>20000?txt.slice(0,20000)+"\n…":txt;
 if(!["txt","md","csv","html","json","docx"].includes(out))out="txt";
 res={src:f,data,name:base+"-"+{o:"eski",n:"yangi",c:"kirill"}[$("ft").value]+"."+out};
 $("fs").textContent=f.name+": "+n+" ta almashtirish"+(txt==null?"":" (natija pastda ko‘rinadi)");
+
 $("dl").hidden=false;
 }catch(e){$("fs").textContent="Faylni o‘qib bo‘lmadi ("+((e&&e.message)||e)+").";res=null}}
 $("fi").onchange=e=>{if(e.target.files[0])file(e.target.files[0]);e.target.value=""};
@@ -134,5 +173,10 @@ const d=$("drop");d.onclick=()=>$("fi").click();
 d.ondragover=e=>{e.preventDefault();d.classList.add("o")};d.ondragleave=()=>d.classList.remove("o");
 d.ondrop=e=>{e.preventDefault();d.classList.remove("o");if(e.dataTransfer.files[0])file(e.dataTransfer.files[0])};
 $("dl").onclick=()=>{if(!res)return;const b=res.data instanceof Blob?res.data:new Blob([res.data],{type:"text/plain;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=res.name;document.body.appendChild(a);a.click();a.remove()};
+function loadEx(){EX={};$("ex").value.split("\n").forEach(l=>{const i=l.indexOf("=");if(i>0){const k=l.slice(0,i).trim().toLowerCase(),v=l.slice(i+1).trim();if(k&&v)EX[k]=v}})}
+try{$("ex").value=localStorage.getItem("ex")||""}catch(e){}
+loadEx();
+$("ex").oninput=()=>{loadEx();try{localStorage.setItem("ex",$("ex").value)}catch(e){}run()};
+document.addEventListener("click",e=>{const w=e.target.dataset&&e.target.dataset.w;if(!w)return;const x=$("ex");if(!x.value.split("\n").some(l=>l.startsWith(w+"="))){x.value+=(x.value&&!x.value.endsWith("\n")?"\n":"")+w+"=";}x.focus()});
 map("fr","to","map");map("ff","ft","fmap");
 </script></body></html>
