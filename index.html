@@ -1,34 +1,39 @@
 <!doctype html>
 <html lang="uz"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@700&display=swap">
 <title>O‘zbek alifbosi konvertori</title>
 <style>
-:root{--bg:#f7f7f3;--card:#fff;--tx:#1c1c1a;--mut:#6a6a64;--bd:#d9d9d0;--ac:#1f6f5c;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--card:#212120;--tx:#ececE6;--mut:#9a9a92;--bd:#3a3a37;--ac:#4fb59c;--on:#0e1a17}}
-:root[data-theme="dark"]{--bg:#161615;--card:#212120;--tx:#ececE6;--mut:#9a9a92;--bd:#3a3a37;--ac:#4fb59c;--on:#0e1a17}
+:root{--bg:#f4efe2;--card:#fffdf7;--tx:#14233b;--mut:#5d6b7e;--bd:#d8cfb8;--ac:#0b7a86;--gold:#c9a227;--on:#fff;--h1:#17386b;--h2:#0b8a96;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a2c;--card:#12263d;--tx:#eae6d8;--mut:#93a3b8;--bd:#26405c;--ac:#38bfc7;--gold:#e0b84c;--on:#06222a;--h1:#10305f;--h2:#0a6a75}}
+:root[data-theme="dark"]{--bg:#0b1a2c;--card:#12263d;--tx:#eae6d8;--mut:#93a3b8;--bd:#26405c;--ac:#38bfc7;--gold:#e0b84c;--on:#06222a;--h1:#10305f;--h2:#0a6a75}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:860px;margin:0 auto;padding:20px 16px 40px}
-h1{font-size:1.5rem;margin:0 0 4px}
-p.s{color:var(--mut);margin:0 0 18px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:16px}
+body{margin:0;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='none' stroke='%230b7a86' stroke-opacity='.09' stroke-width='1.2'%3E%3Crect x='11' y='11' width='22' height='22'/%3E%3Crect x='11' y='11' width='22' height='22' transform='rotate(45 22 22)'/%3E%3Ccircle cx='22' cy='22' r='3.5'/%3E%3C/g%3E%3C/svg%3E");color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:880px;margin:0 auto;padding:20px 16px 40px}
+.hd{position:relative;overflow:hidden;border-radius:16px;padding:28px 22px 34px;margin-bottom:20px;color:#fff;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.22' stroke-width='1.2'%3E%3Crect x='11' y='11' width='22' height='22'/%3E%3Crect x='11' y='11' width='22' height='22' transform='rotate(45 22 22)'/%3E%3Ccircle cx='22' cy='22' r='3.5'/%3E%3C/g%3E%3C/svg%3E"),linear-gradient(135deg,var(--h1),var(--h2));box-shadow:0 4px 16px rgba(23,56,107,.25)}
+.hd::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='10'%3E%3Cpolygon points='11,0 22,5 11,10 0,5' fill='%23c9a227'/%3E%3C/svg%3E") repeat-x}
+.hd h1{font:700 1.8rem/1.2 "Noto Serif",Georgia,serif;margin:0 0 6px;color:#fff}
+.hd p{margin:0;color:#fff;opacity:.92}
+.card{background:var(--card);border:1px solid var(--bd);border-top:4px solid var(--ac);border-radius:14px;padding:16px;margin-bottom:18px;box-shadow:0 2px 10px rgba(23,56,107,.07)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.seg button,.btn{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:8px;cursor:pointer}
-.seg button.on,.btn.p{background:var(--ac);color:var(--on);border-color:var(--ac)}
-select{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 10px;border-radius:8px}
+.btn{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:10px;cursor:pointer}
+.btn:hover{border-color:var(--ac)}
+.btn.p{background:var(--ac);color:var(--on);border-color:var(--ac);font-weight:600}
+.btn.p:hover{filter:brightness(1.1)}
+select{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 10px;border-radius:10px}
+textarea:focus,select:focus,.btn:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:640px){.grid{grid-template-columns:1fr}}
-label{display:block;font-size:.85rem;color:var(--mut);margin-bottom:4px}
-textarea{width:100%;min-height:200px;resize:vertical;font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:10px}
-#drop{border:2px dashed var(--bd);border-radius:10px;padding:22px;text-align:center;color:var(--mut);cursor:pointer}
-#drop.o{border-color:var(--ac);color:var(--tx)}
+@media(max-width:640px){.grid{grid-template-columns:1fr}.hd h1{font-size:1.5rem}}
+label{display:block;font-size:.85rem;font-weight:600;color:var(--ac);margin-bottom:4px}
+textarea{width:100%;min-height:200px;resize:vertical;font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:10px}
+#drop{border:2px dashed var(--ac);border-radius:12px;padding:24px;text-align:center;color:var(--mut);cursor:pointer;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='none' stroke='%230b7a86' stroke-opacity='.14' stroke-width='1.2'%3E%3Crect x='11' y='11' width='22' height='22'/%3E%3Crect x='11' y='11' width='22' height='22' transform='rotate(45 22 22)'/%3E%3Ccircle cx='22' cy='22' r='3.5'/%3E%3C/g%3E%3C/svg%3E")}
+#drop.o{background-color:var(--bg);color:var(--tx);border-color:var(--gold)}
 .m{color:var(--mut);font-size:.9rem;margin-top:8px}
-.map{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.map span{border:1px solid var(--bd);border-radius:6px;padding:2px 8px;font-size:.9rem}
+.map{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.map span{border:1px solid var(--gold);border-radius:999px;padding:2px 10px;font-size:.9rem}
 </style></head><body><main>
-<h1>O‘zbek alifbosi konvertori</h1>
-<p class="s">Eski lotin, yangi lotin va kirill yozuvlari o‘rtasida matn va fayllarni almashtiring.</p>
+<header class="hd"><h1>O‘zbek alifbosi konvertori</h1><p>Eski lotin, yangi lotin va kirill yozuvlari o‘rtasida matn va fayllarni almashtiring.</p></header>
 
 <div class="card">
 <div class="row"><select id="fr" aria-label="Qayerdan"><option value="o" selected>Eski lotin</option><option value="n">Yangi lotin</option><option value="c">Kirill</option></select><button class="btn" id="sw" title="Almashtirish">⇄</button><select id="to" aria-label="Qayerga"><option value="o">Eski lotin</option><option value="n" selected>Yangi lotin</option><option value="c">Kirill</option></select></div>
