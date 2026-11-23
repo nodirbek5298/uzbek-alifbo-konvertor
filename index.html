@@ -66,14 +66,17 @@ textarea{width:100%;min-height:200px;resize:vertical;font:inherit;background:var
 
 <div class="card">
 <label>Fayl</label><div class="row"><select id="ff" aria-label="Fayl: qayerdan"><option value="o" selected>Eski lotin</option><option value="n">Yangi lotin</option><option value="c">Kirill</option></select><button class="btn" id="fsw" title="Almashtirish">⇄</button><select id="ft" aria-label="Fayl: qayerga"><option value="o">Eski lotin</option><option value="n" selected>Yangi lotin</option><option value="c">Kirill</option></select></div><div class="map" id="fmap"></div>
-<div id="drop" style="margin-top:12px">Faylni shu yerga tashlang yoki tanlash uchun bosing<br><small>.txt .docx .pdf .md .csv .srt .html .json</small></div>
-<input type="file" id="fi" hidden accept=".txt,.docx,.pdf,.md,.csv,.srt,.html,.json">
+<div id="drop" style="margin-top:12px">Faylni shu yerga tashlang yoki tanlash uchun bosing<br><small>.docx .xlsx .pdf .txt .md .csv .srt .html .json</small></div>
+<div class="m">PDF, Word va Excel fayllar o‘z formatida qaytariladi, faqat harflar almashadi.</div>
+<input type="file" id="fi" hidden accept=".docx,.xlsx,.pdf,.txt,.md,.csv,.srt,.html,.json">
 <div class="row" style="margin-top:10px"><button class="btn p" id="dl" hidden>Natijani yuklab olish</button><span class="m" id="fs"></span></div><textarea id="fo" readonly hidden style="margin-top:10px;min-height:140px"></textarea>
 </div>
 <footer class="ft"><div class="dm"></div><div>Muallif: <b>Nodirbek Qalandarov</b></div><div class="lk"><a href="https://t.me/nodir691" target="_blank" rel="noopener">Telegram: @nodir691</a><a href="https://instagram.com/715nodir" target="_blank" rel="noopener">Instagram: 715nodir</a></div></footer>
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js"></script>
 <script>
 const Q="['‘’ʻʼ`´′]";
 const fwd=s=>{let n=0;
@@ -122,26 +125,44 @@ $("fsw").onclick=()=>{const t=$("ff").value;$("ff").value=$("ft").value;$("ft").
 $("a").oninput=run;
 $("cl").onclick=()=>{$("a").value="";run()};
 $("cp").onclick=async()=>{try{await navigator.clipboard.writeText($("b").value)}catch(e){$("b").select();document.execCommand("copy")}$("st").textContent="Nusxalandi"};
-async function docx(f,fn){const z=await JSZip.loadAsync(f);let n=0;
-for(const p of Object.keys(z.files)){if(!/^word\/(document|header\d*|footer\d*|footnotes|endnotes)\.xml$/.test(p))continue;
+const OX={docx:{p:/^word\/(document|header\d*|footer\d*|footnotes|endnotes|comments)\.xml$/,t:/(<w:t(?:\s[^>]*)?>)([^<]*)(<\/w:t>)/g},
+xlsx:{p:/^xl\/(sharedStrings|comments\d*|worksheets\/sheet\d+|drawings\/drawing\d+|charts\/chart\d+)\.xml$/,t:/(<(?:a:)?t(?:\s[^>]*)?>)([^<]*)(<\/(?:a:)?t>)/g}};
+async function ooxml(f,fn,kind){const z=await JSZip.loadAsync(f),o=OX[kind];let n=0;
+for(const p of Object.keys(z.files)){if(!o.p.test(p))continue;
 let x=await z.file(p).async("string");
-x=x.replace(/(<w:t(?:\s[^>]*)?>)([^<]*)(<\/w:t>)/g,(m,a,t,b)=>{t=t.replace(/&apos;|&#39;|&#x27;/g,"'");const[r,c]=fn(t);n+=c;return a+r+b});
+x=x.replace(o.t,(m,a,t,b)=>{t=t.replace(/&apos;|&#39;|&#x27;/g,"'");const[r,c]=fn(t);n+=c;return a+r+b});
 z.file(p,x)}
-return [await z.generateAsync({type:"blob"}),n]}
-async function pdfText(f){pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,o=[];
-for(let i=1;i<=d.numPages;i++){const p=await(await d.getPage(i)).getTextContent();let s="";for(const it of p.items)s+=it.str+(it.hasEOL?"\n":"");o.push(s)}
-return o.join("\n\n")}
+return [await z.generateAsync({type:"blob",compression:"DEFLATE"}),n]}
+const FU={r:"https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans.ttf",b:"https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans-Bold.ttf"};
+async function fontBytes(k){const e=window.FONTS&&window.FONTS[k];
+if(e){const s=atob(e),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}
+let r;try{r=await fetch(FU[k])}catch(x){throw new Error("shrift yuklanmadi, internet kerak")}
+if(!r.ok)throw new Error("shrift yuklanmadi");return new Uint8Array(await r.arrayBuffer())}
+async function pdfConvert(f,fn){
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+const buf=await f.arrayBuffer(),src=await pdfjsLib.getDocument({data:buf.slice(0)}).promise,doc=await PDFLib.PDFDocument.load(buf.slice(0),{ignoreEncryption:true});
+doc.registerFontkit(fontkit);
+const F={},get=async k=>F[k]||(F[k]=await doc.embedFont(await fontBytes(k),{subset:true})),pages=doc.getPages(),W=PDFLib.rgb(1,1,1),K=PDFLib.rgb(0,0,0);let n=0;
+for(let i=1;i<=src.numPages;i++){const pg=await src.getPage(i),tc=await pg.getTextContent(),P=pages[i-1];let ops=false;
+for(const it of tc.items){if(!it.str||!it.str.trim())continue;
+const[t]=fn(it.str);if(t===it.str)continue;
+const m=it.transform;if(Math.abs(m[1])>.01||Math.abs(m[2])>.01)continue;
+if(!ops){try{await pg.getOperatorList()}catch(e){}ops=true}
+let bold=false;try{bold=/bold|black|heavy/i.test(pg.commonObjs.get(it.fontName).name||"")}catch(e){}
+const ft=await get(bold?"b":"r"),size=Math.abs(m[3])||it.height||10,x=m[4],y=m[5],w=it.width||0,tw=ft.widthOfTextAtSize(t,size),s=w>0&&tw>w*1.02?size*w/tw:size;
+try{P.drawRectangle({x:x-.5,y:y-size*.22,width:Math.max(w,tw*s/size)+1,height:size*1.15,color:W});P.drawText(t,{x,y,size:s,font:ft,color:K});n++}catch(e){}}}
+return [new Blob([await doc.save()],{type:"application/pdf"}),n]}
 async function file(f){
 $("fs").textContent="Ishlanmoqda...";$("dl").hidden=true;
 try{const base=f.name.replace(/\.[^.]+$/,""),ext=(f.name.split(".").pop()||"").toLowerCase();
 let data,n,out=ext,txt=null;const cv=conv("ff","ft");
-if(ext=="docx"){[data,n]=await docx(f,cv)}
-else{const t=ext=="pdf"?await pdfText(f):await f.text();
-if(!t.trim()){res=null;$("fo").hidden=true;$("fs").textContent="Faylda matn topilmadi (skan qilingan PDF bo‘lishi mumkin).";return}
-[data,n]=cv(t);txt=data;if(ext=="pdf")out="txt"}
+if(ext=="docx"||ext=="xlsx"){[data,n]=await ooxml(f,cv,ext)}
+else if(ext=="pdf"){[data,n]=await pdfConvert(f,cv);if(!n){res=null;$("fo").hidden=true;$("fs").textContent="PDF'da almashtiriladigan matn topilmadi (skan qilingan bo‘lishi mumkin).";return}}
+else{const t=await f.text();
+if(!t.trim()){res=null;$("fo").hidden=true;$("fs").textContent="Faylda matn topilmadi.";return}
+[data,n]=cv(t);txt=data}
 $("fo").hidden=txt==null;if(txt!=null)$("fo").value=txt.length>20000?txt.slice(0,20000)+"\n…":txt;
-if(!["txt","md","csv","html","json","docx"].includes(out))out="txt";
+if(!["txt","md","csv","html","json","docx","xlsx","pdf"].includes(out))out="txt";
 res={src:f,data,name:base+"-"+{o:"eski",n:"yangi",c:"kirill"}[$("ft").value]+"."+out};
 $("fs").textContent=f.name+": "+n+" ta almashtirish"+(txt==null?"":" (natija pastda ko‘rinadi)");
 
