@@ -10,7 +10,15 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='none' stroke='%230b7a86' stroke-opacity='.09' stroke-width='1.2'%3E%3Crect x='11' y='11' width='22' height='22'/%3E%3Crect x='11' y='11' width='22' height='22' transform='rotate(45 22 22)'/%3E%3Ccircle cx='22' cy='22' r='3.5'/%3E%3C/g%3E%3C/svg%3E");color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:880px;margin:0 auto;padding:20px 16px 40px}
+main{max-width:880px;margin:0 auto;padding:20px 16px 40px;position:relative;z-index:1}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='230'%3E%3Cg transform='rotate(-18 210 115)' fill='%230b7a86' fill-opacity='.13' font-family='Georgia,serif' font-size='15' font-weight='700' text-anchor='middle'%3E%3Ctext x='210' y='92'%3ENodirbek Qalandarov%3C/text%3E%3Ctext x='210' y='114'%3ETelegram: @nodir691%3C/text%3E%3Ctext x='210' y='136'%3EInstagram: 715nodir%3C/text%3E%3C/g%3E%3C/svg%3E")}
+.hd .by{margin-top:6px;font-size:.85rem;font-weight:600;color:#f1d98a;opacity:1}
+.ft{text-align:center;color:var(--mut);padding:10px 0 4px}
+.ft .dm{height:10px;max-width:260px;margin:0 auto 12px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='10'%3E%3Cpolygon points='11,0 22,5 11,10 0,5' fill='%23c9a227'/%3E%3C/svg%3E") repeat-x}
+.ft b{color:var(--tx)}
+.ft .lk{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.ft a{color:var(--ac);font-weight:600;text-decoration:none}
+.ft a:hover{text-decoration:underline}
 .hd{position:relative;overflow:hidden;border-radius:16px;padding:28px 22px 34px;margin-bottom:20px;color:#fff;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.22' stroke-width='1.2'%3E%3Crect x='11' y='11' width='22' height='22'/%3E%3Crect x='11' y='11' width='22' height='22' transform='rotate(45 22 22)'/%3E%3Ccircle cx='22' cy='22' r='3.5'/%3E%3C/g%3E%3C/svg%3E"),linear-gradient(135deg,var(--h1),var(--h2));box-shadow:0 4px 16px rgba(23,56,107,.25)}
 .hd::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='10'%3E%3Cpolygon points='11,0 22,5 11,10 0,5' fill='%23c9a227'/%3E%3C/svg%3E") repeat-x}
 .hd h1{font:700 1.8rem/1.2 "Noto Serif",Georgia,serif;margin:0 0 6px;color:#fff}
@@ -33,7 +41,7 @@ textarea{width:100%;min-height:200px;resize:vertical;font:inherit;background:var
 .map{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .map span{border:1px solid var(--gold);border-radius:999px;padding:2px 10px;font-size:.9rem}
 </style></head><body><main>
-<header class="hd"><h1>O‘zbek alifbosi konvertori</h1><p>Eski lotin, yangi lotin va kirill yozuvlari o‘rtasida matn va fayllarni almashtiring.</p></header>
+<header class="hd"><h1>O‘zbek alifbosi konvertori</h1><p>Eski lotin, yangi lotin va kirill yozuvlari o‘rtasida matn va fayllarni almashtiring.</p><p class="by">Muallif: Nodirbek Qalandarov</p></header>
 
 <div class="card">
 <label>Tarjima: ruscha ⇄ o‘zbekcha</label>
@@ -62,6 +70,7 @@ textarea{width:100%;min-height:200px;resize:vertical;font:inherit;background:var
 <input type="file" id="fi" hidden accept=".txt,.docx,.pdf,.md,.csv,.srt,.html,.json">
 <div class="row" style="margin-top:10px"><button class="btn p" id="dl" hidden>Natijani yuklab olish</button><span class="m" id="fs"></span></div><textarea id="fo" readonly hidden style="margin-top:10px;min-height:140px"></textarea>
 </div>
+<footer class="ft"><div class="dm"></div><div>Muallif: <b>Nodirbek Qalandarov</b></div><div class="lk"><a href="https://t.me/nodir691" target="_blank" rel="noopener">Telegram: @nodir691</a><a href="https://instagram.com/715nodir" target="_blank" rel="noopener">Instagram: 715nodir</a></div></footer>
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
