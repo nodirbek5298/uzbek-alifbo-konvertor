@@ -40,6 +40,11 @@ textarea{width:100%;min-height:200px;resize:vertical;font:inherit;background:var
 .m{color:var(--mut);font-size:.9rem;margin-top:8px}
 .map{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .map span{border:1px solid var(--gold);border-radius:999px;padding:2px 10px;font-size:.9rem}
+.map small{color:var(--mut);align-self:center;font-size:.8rem}
+.chip{cursor:pointer;user-select:none}
+.chip::before{content:"✓ ";color:var(--ac)}
+.chip.off{opacity:.5;text-decoration:line-through}
+.chip.off::before{content:"✗ ";color:var(--mut)}
 </style></head><body><main>
 <header class="hd"><h1>O‘zbek alifbosi konvertori</h1><p>Eski lotin, yangi lotin va kirill yozuvlari o‘rtasida matn va fayllarni almashtiring.</p><p class="by">Muallif: Nodirbek Qalandarov</p></header>
 
@@ -79,13 +84,14 @@ textarea{width:100%;min-height:200px;resize:vertical;font:inherit;background:var
 <script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js"></script>
 <script>
 const Q="['‘’ʻʼ`´′]";
-const fwd=s=>{let n=0;
-s=s.replace(new RegExp("([OoGg])"+Q,"g"),(m,c)=>{n++;return {O:"Ö",o:"ö",G:"Ğ",g:"ğ"}[c]});
-s=s.replace(/([Ss])[Hh]/g,(m,c)=>{n++;return c=="S"?"Ş":"ş"});
-s=s.replace(/([Cc])[Hh]/g,(m,c)=>{n++;return c=="C"?"Ç":"ç"});
+const fwd=(s,on={})=>{let n=0;
+if(on.og!==false)s=s.replace(new RegExp("([Oo])"+Q,"g"),(m,c)=>{n++;return c=="O"?"Ö":"ö"});
+if(on.gg!==false)s=s.replace(new RegExp("([Gg])"+Q,"g"),(m,c)=>{n++;return c=="G"?"Ğ":"ğ"});
+if(on.sh!==false)s=s.replace(/([Ss])[Hh]/g,(m,c)=>{n++;return c=="S"?"Ş":"ş"});
+if(on.ch!==false)s=s.replace(/([Cc])[Hh]/g,(m,c)=>{n++;return c=="C"?"Ç":"ç"});
 return [s,n]};
-const M={"Ö":"O‘","ö":"o‘","Ğ":"G‘","ğ":"g‘","Ş":"Sh","ş":"sh","Ç":"Ch","ç":"ch"};
-const rev=s=>{let n=0;s=s.replace(/[ÖöĞğŞşÇç]/g,m=>{n++;return M[m]});return [s,n]};
+const M={"Ö":"O‘","ö":"o‘","Ğ":"G‘","ğ":"g‘","Ş":"Sh","ş":"sh","Ç":"Ch","ç":"ch"},MK={"Ö":"og","ö":"og","Ğ":"gg","ğ":"gg","Ş":"sh","ş":"sh","Ç":"ch","ç":"ch"};
+const rev=(s,on={})=>{let n=0;s=s.replace(/[ÖöĞğŞşÇç]/g,m=>{if(on[MK[m]]===false)return m;n++;return M[m]});return [s,n]};
 let res=null;
 const $=id=>document.getElementById(id);
 const CY=/[А-Яа-яЁёЎўҚқҒғҲҳ]/g,CL=/[А-Яа-яЁёЎўҚқҒғҲҳ]/,VW=/[аеёиоуўэюяыАЕЁИОУЎЭЮЯЫ]/;
@@ -111,11 +117,13 @@ if(up(c))m=cap(m,len==2&&up(n)&&m.length>1);
 o+=m;i+=len}return o}
 const toOld={o:s=>[s,0],n:rev,c:s=>[cyr2lat(s),(s.match(CY)||[]).length]};
 const fromOld={o:s=>[s,0],n:fwd,c:s=>{const r=lat2cyr(s);return[r,(r.match(CY)||[]).length]}};
-const conv=(A="fr",B="to")=>s=>{const f=$(A).value,t=$(B).value;if(f==t)return[s,0];const[a,n]=toOld[f](s),[b,m]=fromOld[t](a);return[b,Math.max(n,m)]};
-function map(A,B,id){const f=$(A).value,t=$(B).value,nw=f=="n"||t=="n",cy=f=="c"||t=="c";
-let a;if(f==t)a=[];else if(cy)a=nw?["Ў ↔ Ö","Ғ ↔ Ğ","Ш ↔ Ş","Ч ↔ Ç","Қ ↔ Q","Ҳ ↔ H"]:["Ў ↔ O‘","Ғ ↔ G‘","Ш ↔ Sh","Ч ↔ Ch","Қ ↔ Q","Ҳ ↔ H"];
-else a=t=="n"?["O‘ → Ö","G‘ → Ğ","Sh → Ş","Ch → Ç"]:["Ö → O‘","Ğ → G‘","Ş → Sh","Ç → Ch"];
-$(id).innerHTML=a.map(x=>"<span>"+x+"</span>").join("")}
+const ST={map:{},fmap:{}};
+const conv=(A="fr",B="to",id="map")=>s=>{const f=$(A).value,t=$(B).value,on=ST[id];if(f==t)return[s,0];const[a,n]=toOld[f](s,on),[b,m]=fromOld[t](a,on);return[b,Math.max(n,m)]};
+function map(A,B,id){const f=$(A).value,t=$(B).value,nw=f=="n"||t=="n",cy=f=="c"||t=="c",s=ST[id];
+let a=[];
+if(f!=t){if(cy)a=(nw?[["Ў ↔ Ö","og"],["Ғ ↔ Ğ","gg"],["Ш ↔ Ş","sh"],["Ч ↔ Ç","ch"]]:[["Ў ↔ O‘"],["Ғ ↔ G‘"],["Ш ↔ Sh"],["Ч ↔ Ch"]]).concat([["Қ ↔ Q"],["Ҳ ↔ H"]]);
+else a=t=="n"?[["O‘ → Ö","og"],["G‘ → Ğ","gg"],["Sh → Ş","sh"],["Ch → Ç","ch"]]:[["Ö → O‘","og"],["Ğ → G‘","gg"],["Ş → Sh","sh"],["Ç → Ch","ch"]]}
+$(id).innerHTML=a.map(([x,k])=>k?'<span class="chip'+(s[k]===false?' off':'')+'" data-k="'+k+'">'+x+'</span>':"<span>"+x+"</span>").join("")+(a.some(x=>x[1])?"<small>Harfni bosib yoqish yoki o‘chirish mumkin</small>":"")}
 function run(){const [r,n]=conv()($("a").value);$("b").value=r;$("st").textContent=$("a").value?n+" ta almashtirish":""}
 const chg=()=>{map("fr","to","map");run()},fchg=()=>{map("ff","ft","fmap");if(res)file(res.src)};
 $("fr").onchange=$("to").onchange=chg;
@@ -125,12 +133,18 @@ $("fsw").onclick=()=>{const t=$("ff").value;$("ff").value=$("ft").value;$("ft").
 $("a").oninput=run;
 $("cl").onclick=()=>{$("a").value="";run()};
 $("cp").onclick=async()=>{try{await navigator.clipboard.writeText($("b").value)}catch(e){$("b").select();document.execCommand("copy")}$("st").textContent="Nusxalandi"};
-const OX={docx:{p:/^word\/(document|header\d*|footer\d*|footnotes|endnotes|comments)\.xml$/,t:/(<w:t(?:\s[^>]*)?>)([^<]*)(<\/w:t>)/g},
-xlsx:{p:/^xl\/(sharedStrings|comments\d*|worksheets\/sheet\d+|drawings\/drawing\d+|charts\/chart\d+)\.xml$/,t:/(<(?:a:)?t(?:\s[^>]*)?>)([^<]*)(<\/(?:a:)?t>)/g}};
+const OX={docx:{p:/^word\/(document|header\d*|footer\d*|footnotes|endnotes|comments)\.xml$/,b:/<w:p[ >][\s\S]*?<\/w:p>/g,t:/(<w:t(?:\s[^>]*)?>)([^<]*)(<\/w:t>)/g},
+xlsx:{p:/^xl\/(sharedStrings|comments\d*|worksheets\/sheet\d+|drawings\/drawing\d+|charts\/chart\d+)\.xml$/,b:/<(si|is|text|a:p)[ >][\s\S]*?<\/\1>/g,t:/(<(?:a:)?t(?:\s[^>]*)?>)([^<]*)(<\/(?:a:)?t>)/g}};
+function runs(blk,tr,fn){const nodes=[];blk.replace(tr,(m,a,t)=>{nodes.push(t.replace(/&apos;|&#39;|&#x27;/g,"'"));return m});
+if(!nodes.length)return[blk,0];
+const T=nodes.join(""),[T2,n]=fn(T);if(T2===T)return[blk,0];
+const outs=[];let s=0,pv=0;
+for(let i=0;i<nodes.length;i++){s+=nodes[i].length;const a=i==nodes.length-1?T2.length:Math.max(pv,fn(T.slice(0,s))[0].length);outs.push(T2.slice(pv,a));pv=a}
+let j=0;return[blk.replace(tr,(m,a,t,b)=>a+outs[j++]+b),n]}
 async function ooxml(f,fn,kind){const z=await JSZip.loadAsync(f),o=OX[kind];let n=0;
 for(const p of Object.keys(z.files)){if(!o.p.test(p))continue;
 let x=await z.file(p).async("string");
-x=x.replace(o.t,(m,a,t,b)=>{t=t.replace(/&apos;|&#39;|&#x27;/g,"'");const[r,c]=fn(t);n+=c;return a+r+b});
+x=x.replace(o.b,blk=>{const[r,c]=runs(blk,o.t,fn);n+=c;return r});
 z.file(p,x)}
 return [await z.generateAsync({type:"blob",compression:"DEFLATE"}),n]}
 const FU={r:"https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans.ttf",b:"https://cdn.jsdelivr.net/npm/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans-Bold.ttf"};
@@ -155,7 +169,7 @@ return [new Blob([await doc.save()],{type:"application/pdf"}),n]}
 async function file(f){
 $("fs").textContent="Ishlanmoqda...";$("dl").hidden=true;
 try{const base=f.name.replace(/\.[^.]+$/,""),ext=(f.name.split(".").pop()||"").toLowerCase();
-let data,n,out=ext,txt=null;const cv=conv("ff","ft");
+let data,n,out=ext,txt=null;const cv=conv("ff","ft","fmap");
 if(ext=="docx"||ext=="xlsx"){[data,n]=await ooxml(f,cv,ext)}
 else if(ext=="pdf"){[data,n]=await pdfConvert(f,cv);if(!n){res=null;$("fo").hidden=true;$("fs").textContent="PDF'da almashtiriladigan matn topilmadi (skan qilingan bo‘lishi mumkin).";return}}
 else{const t=await f.text();
@@ -186,5 +200,6 @@ $("tg").onclick=async()=>{const v=$("ti").value.trim();if(!v)return;const d=$("t
 try{let o;if(d=="ru"){o=await translate(v,"uz");if(/[ЎўҚқҒғҲҳ]/.test(o))o=toOld.c(o)[0];o=fromOld[u](o)[0]}else o=await translate(toOld[u](v)[0],"ru");
 $("tx").value=o;$("tt").textContent=""}catch(e){$("tt").textContent="Tarjima bo‘lmadi ("+((e&&e.message)||e)+")."}$("tg").disabled=false};
 $("tc").onclick=async()=>{try{await navigator.clipboard.writeText($("tx").value)}catch(e){$("tx").select();document.execCommand("copy")}$("tt").textContent="Nusxalandi"};
+document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest(".chip");if(!c)return;const id=c.parentNode.id,k=c.dataset.k;ST[id][k]=ST[id][k]===false;id=="map"?chg():fchg()});
 map("fr","to","map");map("ff","ft","fmap");
 </script></body></html>
